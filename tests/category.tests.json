@@ -1,0 +1,154 @@
+{
+	"actions": [
+		{
+			"method": "post",
+			"url": "/api/user/login",
+			"params": {
+				"email": "fabio.rotondo.test@gmail.com",
+				"password": "ciao123"
+			},
+			"fields": [
+				[
+					"access_token",
+					"token"
+				]
+			]
+		},
+		{
+			"method": "post",
+			"url": "/api/category/add",
+			"params": {
+				"title": "Category #1 (test)",
+				"description": "The first category",
+				"module": "test"
+			},
+			"auth": true,
+			"tests": [
+				{
+					"field": "category._key",
+					"mode": ">=",
+					"value": 0
+				}
+			],
+			"fields": [
+				[
+					"category._id",
+					"id_category_01"
+				]
+			]
+		},
+		{
+			"method": "post",
+			"url": "/api/category/add",
+			"params": {
+				"title": "Category #2 (test)",
+				"description": "The second test category",
+				"module": "test"
+			},
+			"auth": true,
+			"tests": [
+				{
+					"field": "category._key",
+					"mode": ">=",
+					"value": 0
+				}
+			],
+			"fields": [
+				[
+					"category._id",
+					"id_category_02"
+				]
+			]
+		},
+		{
+			"method": "post",
+			"url": "/api/category/add",
+			"params": {
+				"title": "Super Cat #1 (super)",
+				"description": "The first super category",
+				"module": "super"
+			},
+			"auth": true,
+			"tests": [
+				{
+					"field": "category._key",
+					"mode": ">=",
+					"value": 0
+				}
+			],
+			"fields": [
+				[
+					"category._id",
+					"id_category_02"
+				]
+			]
+		},
+		{
+			"method": "post",
+			"url": "/api/category/add",
+			"params": {
+				"title": "Category #1 - Updated",
+				"_id": "%(id_category_01)s"
+			},
+			"auth": true,
+			"tests": [
+				{
+					"field": "category.title",
+					"mode": "EQUAL",
+					"value": "Category #1 - Updated"
+				}
+			]
+		},
+		{
+			"method": "post",
+			"url": "/api/category/add",
+			"params": {
+				"title": "Sub Categ #1",
+				"description": "Sub category 01",
+				"id_parent": "%(id_category_01)s"
+			},
+			"auth": true,
+			"tests": [
+				{
+					"field": "category._key",
+					"mode": ">=",
+					"value": 0
+				}
+			],
+			"fields": [
+				[
+					"category._id",
+					"id_subcat_01"
+				]
+			]
+		},
+		{
+			"method": "get",
+			"url": "/api/category/list",
+			"params": {
+				"module": "test"
+			},
+			"tests": [
+				{
+					"field": "tree",
+					"value": 2,
+					"mode": "LEN"
+				}
+			]
+		},
+		{
+			"method": "get",
+			"url": "/api/category/list",
+			"params": {
+				"module": "super"
+			},
+			"tests": [
+				{
+					"field": "tree",
+					"value": 1,
+					"mode": "LEN"
+				}
+			]
+		}
+	]
+}
