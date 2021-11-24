@@ -114,8 +114,6 @@ export const post_category_admin_add = ( req: ILRequest, title: string, slug: st
 
 		await _move_category_image( req, categ );
 
-		console.log( "---- CATEGORY: ", categ );
-
 		categ = await collection_add( _coll_categories, categ, false, CategoryKeys );
 
 		return cback ? cback( null, categ ) : resolve( categ );
@@ -205,8 +203,6 @@ export const get_category_admin_list = ( req: ILRequest, parent_only?: boolean, 
 		/*=== d2r_start get_category_admin_list ===*/
 		const domain = await system_domain_get_by_session( req );
 		const conds = parent_only ? { domain: domain.code, id_parent: { mode: 'null', name: 'id_parent' } } : { domain: domain.code };
-
-		console.log( "---- CONDS: ", conds );
 
 		const res = await collection_find_all_dict( req.db, COLL_CATEGORIES, conds, CategoryKeys );
 
