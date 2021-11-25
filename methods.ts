@@ -56,6 +56,7 @@ const _slug_transform = ( slug: string ) => {
 	return slug.replace( /[^a-zA-Z0-9_-]/g, '-' ).replace( /--+/g, '-' ).toLowerCase();
 };
 
+/*
 const _move_category_image = async ( req: ILRequest, c: Category ) => {
 	const u2 = upload_info( req, 'image' );
 	if ( !u2 ) return;
@@ -70,6 +71,7 @@ const _move_category_image = async ( req: ILRequest, c: Category ) => {
 
 	c.image = fname;
 };
+*/
 /*=== d2r_end __file_header ===*/
 
 // {{{ post_category_admin_add ( req: ILRequest, title: string, slug: string, id_parent?: string, description?: string, modules?: string[], top?: boolean, visible: boolean = true, image?: string, cback: LCBack = null ): Promise<Category>
@@ -101,7 +103,7 @@ export const post_category_admin_add = ( req: ILRequest, title: string, slug: st
 
 		const domain = await system_domain_get_by_session( req );
 
-		let categ: Category = { is_folder: false, id: mkid( 'category' ), title, description, modules: [], id_owner: req.user.id, id_parent, domain: domain.code, visible, slug, top };
+		let categ: Category = { is_folder: false, id: mkid( 'category' ), title, description, modules: [], id_owner: req.user.id, id_parent, domain: domain.code, visible, slug, top, image };
 
 		modules.forEach( ( m ) => _add_module( categ, m ) );
 
@@ -112,7 +114,7 @@ export const post_category_admin_add = ( req: ILRequest, title: string, slug: st
 			await collection_add( _coll_categories, parent );
 		}
 
-		await _move_category_image( req, categ );
+		// await _move_category_image( req, categ );
 
 		categ = await collection_add( _coll_categories, categ, false, CategoryKeys );
 
@@ -151,8 +153,8 @@ export const patch_category_admin_update = ( req: ILRequest, id: string, id_pare
 				return cback ? cback( err ) : reject( err );
 		}
 
-		categ = { ...categ, ...keys_valid( { id_parent, title, description, modules, visible, slug, top } ) };
-		await _move_category_image( req, categ );
+		categ = { ...categ, ...keys_valid( { id_parent, title, description, modules, visible, slug, top, image } ) };
+		// await _move_category_image( req, categ );
 		categ = await collection_add( _coll_categories, categ, false, CategoryKeys );
 
 		return cback ? cback( null, categ ) : resolve( categ );
