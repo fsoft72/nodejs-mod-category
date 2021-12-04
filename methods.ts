@@ -1,13 +1,18 @@
 
 import { ILRequest, ILResponse, LCback, ILiweConfig, ILError, ILiWE } from '../../liwe/types';
-import { collection_add, collection_find_all, collection_find_one, collection_find_one_dict, collection_find_all_dict, collection_del_one_dict, collection_del_all_dict, collection_init, mkid, prepare_filters } from '../../liwe/arangodb';
+import { collection_add, collection_count, collection_find_all, collection_find_by_id, collection_find_one, collection_find_one_dict, collection_find_all_dict, collection_del_one_dict, collection_del_all_dict, collection_init, mkid, prepare_filters } from '../../liwe/arangodb';
 import { DocumentCollection } from 'arangojs/collection';
+import { $l } from '../../liwe/locale';
 
 import {
 	Category, CategoryKeys, CategorySmallItem, CategorySmallItemKeys, CategoryTreeItem, CategoryTreeItemKeys
 } from './types';
 
 let _liwe: ILiWE = null;
+
+const _ = ( txt: string, vals: any = null, plural = false ) => {
+	return $l( txt, vals, plural, "category" );
+};
 
 let _coll_categories: DocumentCollection = null;
 
@@ -16,10 +21,7 @@ const COLL_CATEGORIES = "categories";
 /*=== d2r_start __file_header === */
 import { keys_valid, list_add, list_del, set_attr } from '../../liwe/utils';
 import { system_domain_get_by_session } from '../system/methods';
-import { upload_info } from '../../liwe/upload';
-import { public_fullpath } from '../../liwe/liwe';
-import { mkdir, rm } from '../../liwe/fs';
-import { resize } from '../../liwe/image';
+import { upload_set_filename } from '../upload/methods';
 
 const category_get = async ( req: ILRequest, id?: string, slug?: string ): Promise<Category> => {
 	if ( !id && !slug ) return null;
@@ -115,6 +117,8 @@ export const post_category_admin_add = ( req: ILRequest, title: string, slug: st
 		}
 
 		// await _move_category_image( req, categ );
+
+		if ( image ) categ = await upload_set_filename( categ, "image", "image_url" );
 
 		categ = await collection_add( _coll_categories, categ, false, CategoryKeys );
 

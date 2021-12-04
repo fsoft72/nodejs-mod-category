@@ -18,8 +18,10 @@ export interface Category {
 	title?: string;
 	/** Category description */
 	description?: string;
-	/** Category image */
+	/** Category ID */
 	image?: string;
+	/** Category image URL */
+	image_url?: string;
 	/** Category slug */
 	slug?: string;
 	/** If the category is visible */
@@ -39,6 +41,7 @@ export const CategoryKeys = {
 	'title': { type: 'string', priv: false },
 	'description': { type: 'string', priv: false },
 	'image': { type: 'string', priv: false },
+	'image_url': { type: 'string', priv: false },
 	'slug': { type: 'string', priv: false },
 	'visible': { type: 'boolean', priv: false },
 	'top': { type: 'boolean', priv: false },
@@ -61,6 +64,8 @@ export interface CategoryTreeItem {
 	description?: any;
 	/** image */
 	image?: any;
+	/** image URL */
+	image_url?: any;
 	/** the children of this Tree Item */
 	children?: Category[];
 }
@@ -73,6 +78,7 @@ export const CategoryTreeItemKeys = {
 	'title': { type: 'any', priv: false },
 	'description': { type: 'any', priv: false },
 	'image': { type: 'any', priv: false },
+	'image_url': { type: 'any', priv: false },
 	'children': { type: 'Category[]', priv: false },
 };
 
@@ -86,6 +92,8 @@ export interface CategorySmallItem {
 	description?: any;
 	/** image */
 	image?: any;
+	/** image URL */
+	image_url?: any;
 }
 
 export const CategorySmallItemKeys = {
@@ -93,5 +101,6 @@ export const CategorySmallItemKeys = {
 	'title': { type: 'any', priv: false },
 	'description': { type: 'any', priv: false },
 	'image': { type: 'any', priv: false },
+	'image_url': { type: 'any', priv: false },
 };
 

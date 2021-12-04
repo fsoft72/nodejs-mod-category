@@ -1,6 +1,7 @@
 
 import { ILRequest, ILResponse, ILApplication, ILiweConfig, ILError, ILiWE } from '../../liwe/types';
 import { send_error, send_ok, typed_dict } from "../../liwe/utils";
+import { locale_load } from '../../liwe/locale';
 
 import { perms } from '../../liwe/auth';
 
@@ -22,6 +23,7 @@ export const init = ( liwe: ILiWE ) => {
 
 	console.log( "    - Category " );
 
+	liwe.cfg.app.languages.map( ( l ) => locale_load( "category", l ) );
 	category_db_init ( liwe );
 
 
@@ -37,7 +39,7 @@ export const init = ( liwe: ILiWE ) => {
 			{ name: "image", type: "string" }
 		] );
 
-		if ( ___errors.length ) return send_error ( res, { message: `Missing required fields: ${___errors.join ( ', ' )}` } );
+		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		post_category_admin_add ( req,title, slug, id_parent, description, modules, top, visible, image,  ( err: ILError, category: Category ) => {
 			if ( err ) return send_error( res, err );
@@ -59,7 +61,7 @@ export const init = ( liwe: ILiWE ) => {
 			{ name: "image", type: "string" }
 		] );
 
-		if ( ___errors.length ) return send_error ( res, { message: `Missing required fields: ${___errors.join ( ', ' )}` } );
+		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		patch_category_admin_update ( req,id, id_parent, title, slug, description, modules, top, visible, image,  ( err: ILError, category: Category ) => {
 			if ( err ) return send_error( res, err );
@@ -74,7 +76,7 @@ export const init = ( liwe: ILiWE ) => {
 			{ name: "data", type: "any", required: true }
 		] );
 
-		if ( ___errors.length ) return send_error ( res, { message: `Missing required fields: ${___errors.join ( ', ' )}` } );
+		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		patch_category_admin_fields ( req,id, data,  ( err: ILError, category: Category ) => {
 			if ( err ) return send_error( res, err );
@@ -88,7 +90,7 @@ export const init = ( liwe: ILiWE ) => {
 			{ name: "parent_only", type: "boolean" }
 		] );
 
-		if ( ___errors.length ) return send_error ( res, { message: `Missing required fields: ${___errors.join ( ', ' )}` } );
+		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		get_category_admin_list ( req,parent_only,  ( err: ILError, categories: Category[] ) => {
 			if ( err ) return send_error( res, err );
@@ -102,7 +104,7 @@ export const init = ( liwe: ILiWE ) => {
 			{ name: "id", type: "string", required: true }
 		] );
 
-		if ( ___errors.length ) return send_error ( res, { message: `Missing required fields: ${___errors.join ( ', ' )}` } );
+		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		delete_category_admin_del ( req,id,  ( err: ILError, ids: string[] ) => {
 			if ( err ) return send_error( res, err );
@@ -117,7 +119,7 @@ export const init = ( liwe: ILiWE ) => {
 			{ name: "module", type: "string", required: true }
 		] );
 
-		if ( ___errors.length ) return send_error ( res, { message: `Missing required fields: ${___errors.join ( ', ' )}` } );
+		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		post_category_admin_module_add ( req,id, module,  ( err: ILError, category: Category ) => {
 			if ( err ) return send_error( res, err );
@@ -132,7 +134,7 @@ export const init = ( liwe: ILiWE ) => {
 			{ name: "module", type: "string", required: true }
 		] );
 
-		if ( ___errors.length ) return send_error ( res, { message: `Missing required fields: ${___errors.join ( ', ' )}` } );
+		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		delete_category_admin_module_del ( req,id, module,  ( err: ILError, category: Category ) => {
 			if ( err ) return send_error( res, err );
@@ -147,7 +149,7 @@ export const init = ( liwe: ILiWE ) => {
 			{ name: "module", type: "string" }
 		] );
 
-		if ( ___errors.length ) return send_error ( res, { message: `Missing required fields: ${___errors.join ( ', ' )}` } );
+		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		get_category_list ( req,id_category, module,  ( err: ILError, tree: CategoryTreeItem ) => {
 			if ( err ) return send_error( res, err );
@@ -162,7 +164,7 @@ export const init = ( liwe: ILiWE ) => {
 			{ name: "limit", type: "number" }
 		] );
 
-		if ( ___errors.length ) return send_error ( res, { message: `Missing required fields: ${___errors.join ( ', ' )}` } );
+		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		get_category_top_list ( req,module, limit,  ( err: ILError, categs: CategorySmallItem[] ) => {
 			if ( err ) return send_error( res, err );
