@@ -158,7 +158,7 @@ export const patch_category_admin_update = ( req: ILRequest, id: string, id_pare
 		}
 
 		categ = { ...categ, ...keys_valid( { id_parent, title, description, modules, visible, slug, top, image } ) };
-		// await _move_category_image( req, categ );
+		if ( image ) categ = await upload_set_filename( categ, "image", "image_url" );
 		categ = await collection_add( _coll_categories, categ, false, CategoryKeys );
 
 		return cback ? cback( null, categ ) : resolve( categ );
@@ -189,6 +189,7 @@ export const patch_category_admin_fields = ( req: ILRequest, id: string, data: a
 		}
 
 		categ = { ...categ, ...keys_valid( data ) };
+		if ( data.image ) categ = await upload_set_filename( categ, "image", "image_url" );
 		categ = await collection_add( _coll_categories, categ, false, CategoryKeys );
 
 		return cback ? cback( null, categ ) : resolve( categ );
