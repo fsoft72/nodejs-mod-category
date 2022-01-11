@@ -23,7 +23,9 @@ import { keys_valid, list_add, list_del, set_attr } from '../../liwe/utils';
 import { system_domain_get_by_session } from '../system/methods';
 import { upload_set_filename } from '../upload/methods';
 
-const category_get = async ( req: ILRequest, id?: string, slug?: string ): Promise<Category> => {
+export const CATEGORY_EMPTY_ID = "EMPTY_ID";
+
+export const category_get = async ( req: ILRequest, id?: string, slug?: string ): Promise<Category> => {
 	if ( !id && !slug ) return null;
 
 	return await collection_find_one_dict( req.db, 'categories', { id, slug } );
@@ -380,6 +382,17 @@ export const category_db_init = ( liwe: ILiWE, cback: LCback = null ): Promise<b
 		], false );
 
 		/*=== d2r_start category_db_init ===*/
+		const cat = await category_get( { db: liwe.db } as ILRequest, 'EMPTY_ID' );
+		if ( !cat ) {
+			await collection_add( _coll_categories, {
+				id: CATEGORY_EMPTY_ID,
+				title: 'no category',
+				id_parent: '', is_folder: false,
+				modules: [],
+				slug: '__empty__', visible: true, top: true, domain: '', id_owner: '', created: new Date()
+			} );
+		}
+
 		return cback ? cback( null, true ) : resolve( true );
 		/*=== d2r_end category_db_init ===*/
 	} );
