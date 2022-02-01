@@ -379,7 +379,7 @@ export const category_db_init = ( liwe: ILiWE, cback: LCback = null ): Promise<b
 			{ type: "persistent", fields: [ "visible" ], unique: false },
 			{ type: "persistent", fields: [ "top" ], unique: false },
 			{ type: "persistent", fields: [ "modules[*]" ], unique: false },
-		], false );
+		] );
 
 		/*=== d2r_start category_db_init ===*/
 		const cat = await category_get( { db: liwe.db } as ILRequest, 'EMPTY_ID' );
