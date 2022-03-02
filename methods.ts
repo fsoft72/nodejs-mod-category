@@ -349,7 +349,7 @@ export const get_category_list = ( req: ILRequest, id_category?: string, module?
 export const get_category_top_list = ( req: ILRequest, module?: string, limit?: number, cback: LCback = null ): Promise<CategorySmallItem[]> => {
 	return new Promise( async ( resolve, reject ) => {
 		/*=== d2r_start get_category_top_list ===*/
-		const csi: CategorySmallItem[] = await collection_find_all_dict( req.db, COLL_CATEGORIES, { module, top: true }, CategorySmallItemKeys,
+		const csi: CategorySmallItem[] = await collection_find_all_dict( req.db, COLL_CATEGORIES, { modules: [ module ], top: true }, CategorySmallItemKeys,
 			{ sort: [ { field: 'title' } ], rows: limit } );
 
 		return cback ? cback( null, csi ) : resolve( csi );
@@ -379,7 +379,7 @@ export const category_db_init = ( liwe: ILiWE, cback: LCback = null ): Promise<b
 			{ type: "persistent", fields: [ "visible" ], unique: false },
 			{ type: "persistent", fields: [ "top" ], unique: false },
 			{ type: "persistent", fields: [ "modules[*]" ], unique: false },
-		] );
+		], { drop: false } );
 
 		/*=== d2r_start category_db_init ===*/
 		const cat = await category_get( { db: liwe.db } as ILRequest, 'EMPTY_ID' );
