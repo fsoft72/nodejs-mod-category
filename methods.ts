@@ -324,9 +324,9 @@ export const get_category_list = ( req: ILRequest, id_category?: string, module?
     FOR s IN categories
       SORT s.title
       FILTER s.id_parent == doc.id
-      RETURN { id: s.id, title: s.title, id_parent: s.id_parent }
+      RETURN { id: s.id, title: s.title, id_parent: s.id_parent, slug: s.slug, modules: s.modules }
   )
-  RETURN MERGE ( { id: doc.id, title: doc.title, id_parent: doc.id_parent, is_folder: doc.is_folder, modules: doc.modules }, { children } )`, values );
+  RETURN MERGE ( { id: doc.id, title: doc.title, id_parent: doc.id_parent, is_folder: doc.is_folder, modules: doc.modules, slug: doc.slug }, { children } )`, values );
 
 		if ( !categs.length ) return cback ? cback( null, null ) : resolve( null );
 

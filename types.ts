@@ -66,6 +66,8 @@ export interface CategoryTreeItem {
 	image?: any;
 	/** image URL */
 	image_url?: any;
+	/** slug */
+	slug?: any;
 	/** the children of this Tree Item */
 	children?: Category[];
 }
@@ -79,6 +81,7 @@ export const CategoryTreeItemKeys = {
 	'description': { type: 'any', priv: false },
 	'image': { type: 'any', priv: false },
 	'image_url': { type: 'any', priv: false },
+	'slug': { type: 'any', priv: false },
 	'children': { type: 'Category[]', priv: false },
 };
 
