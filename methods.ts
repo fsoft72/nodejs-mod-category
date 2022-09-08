@@ -312,8 +312,8 @@ export const get_category_list = ( req: ILRequest, id_category?: string, module?
 		const [ filters, values ] = prepare_filters( 'doc', {
 			module: {
 				name: 'modules',
-				val: module,
-				mode: 'm'
+				val: [ module ],
+				mode: 'a'
 			}, id: id_category
 		} );
 
