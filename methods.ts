@@ -156,8 +156,10 @@ export const patch_category_admin_update = ( req: ILRequest, id: string, id_pare
 
 		if ( slug ) {
 			slug = _slug_transform( slug );
-			if ( await _slug_valid( req, slug, err, id ) == false )
+			if ( await _slug_valid( req, slug, err, id ) == false ) {
+				err.message = 'Slug already in use';
 				return cback ? cback( err ) : reject( err );
+			}
 		}
 
 		categ = { ...categ, ...keys_valid( { id_parent, title, description, modules, visible, slug, top, image } ) };

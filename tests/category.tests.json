@@ -4,8 +4,9 @@
 			"method": "post",
 			"url": "/api/user/login",
 			"params": {
-				"email": "fabio.rotondo.test@gmail.com",
-				"password": "ciao123"
+				"email": "admin@gmail.com",
+				"password": "Ciao123!",
+				"recaptcha": "ciao"
 			},
 			"fields": [
 				[
@@ -16,79 +17,88 @@
 		},
 		{
 			"method": "post",
-			"url": "/api/category/add",
+			"url": "/api/category/admin/add",
 			"params": {
 				"title": "Category #1 (test)",
 				"description": "The first category",
-				"module": "test"
+				"modules": [
+					"test"
+				],
+				"slug": "cat-1"
 			},
 			"auth": true,
 			"tests": [
 				{
-					"field": "category._key",
-					"mode": ">=",
+					"field": "category.id",
+					"mode": "SIZE-GT",
 					"value": 0
 				}
 			],
 			"fields": [
 				[
-					"category._id",
+					"category.id",
 					"id_category_01"
 				]
 			]
 		},
 		{
 			"method": "post",
-			"url": "/api/category/add",
+			"url": "/api/category/admin/add",
 			"params": {
 				"title": "Category #2 (test)",
 				"description": "The second test category",
-				"module": "test"
+				"modules": [
+					"test"
+				],
+				"slug": "cat-2"
 			},
 			"auth": true,
 			"tests": [
 				{
-					"field": "category._key",
-					"mode": ">=",
+					"field": "category.id",
+					"mode": "SIZE-GT",
 					"value": 0
 				}
 			],
 			"fields": [
 				[
-					"category._id",
+					"category.id",
 					"id_category_02"
 				]
 			]
 		},
 		{
 			"method": "post",
-			"url": "/api/category/add",
+			"url": "/api/category/admin/add",
 			"params": {
 				"title": "Super Cat #1 (super)",
 				"description": "The first super category",
-				"module": "super"
+				"modules": [
+					"super"
+				],
+				"slug": "super-cat-1"
 			},
 			"auth": true,
 			"tests": [
 				{
-					"field": "category._key",
-					"mode": ">=",
+					"field": "category.id",
+					"mode": "SIZE-GT",
 					"value": 0
 				}
 			],
 			"fields": [
 				[
-					"category._id",
-					"id_category_02"
+					"category.id",
+					"id_category_03"
 				]
 			]
 		},
 		{
-			"method": "post",
-			"url": "/api/category/add",
+			"method": "PATCH",
+			"url": "/api/category/admin/update",
 			"params": {
-				"title": "Category #1 - Updated",
-				"_id": "%(id_category_01)s"
+				"id": "%(id_category_01)s",
+				"title": "Category #1 - Updated"
 			},
 			"auth": true,
 			"tests": [
@@ -101,23 +111,24 @@
 		},
 		{
 			"method": "post",
-			"url": "/api/category/add",
+			"url": "/api/category/admin/add",
 			"params": {
 				"title": "Sub Categ #1",
 				"description": "Sub category 01",
-				"id_parent": "%(id_category_01)s"
+				"id_parent": "%(id_category_01)s",
+				"slug": "sub-cat-1"
 			},
 			"auth": true,
 			"tests": [
 				{
-					"field": "category._key",
-					"mode": ">=",
+					"field": "category.id",
+					"mode": "SIZE-GT",
 					"value": 0
 				}
 			],
 			"fields": [
 				[
-					"category._id",
+					"category.id",
 					"id_subcat_01"
 				]
 			]
