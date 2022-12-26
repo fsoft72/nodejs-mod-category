@@ -1,7 +1,6 @@
 
 import { ILRequest, ILResponse, LCback, ILiweConfig, ILError, ILiWE } from '../../liwe/types';
 import { mkid } from '../../liwe/utils';
-import { collection_add, collection_count, collection_find_all, collection_find_one, collection_find_one_dict, collection_find_all_dict, collection_del_one_dict, collection_del_all_dict, collection_init, prepare_filters } from '../../liwe/arangodb';
 import { DocumentCollection } from 'arangojs/collection';
 import { $l } from '../../liwe/locale';
 
@@ -23,13 +22,15 @@ const COLL_CATEGORIES = "categories";
 import { keys_valid, list_add, list_del, set_attr } from '../../liwe/utils';
 import { system_domain_get_by_session } from '../system/methods';
 import { upload_set_filename } from '../upload/methods';
+import { adb_record_add, adb_query_all, adb_find_one, adb_find_all, adb_del_one, adb_prepare_filters } from '../../liwe/db/arango';
+import { collection_init } from '../../liwe/arangodb';
 
 export const CATEGORY_EMPTY_ID = "EMPTY_ID";
 
 export const category_get = async ( req: ILRequest, id?: string, slug?: string ): Promise<Category> => {
 	if ( !id && !slug ) return null;
 
-	return await collection_find_one_dict( req.db, 'categories', { id, slug } );
+	return await adb_find_one( req.db, 'categories', { id, slug } );
 };
 
 const _add_module = ( c: Category, mod: string ) => {
@@ -116,14 +117,14 @@ export const post_category_admin_add = ( req: ILRequest, title: string, slug: st
 			const parent: Category = await category_get( req, id_parent );
 			if ( !parent ) return cback ? cback( err ) : reject( err );
 			parent.is_folder = true;
-			await collection_add( _coll_categories, parent );
+			await adb_record_add( req.db, COLL_CATEGORIES, parent );
 		}
 
 		// await _move_category_image( req, categ );
 
 		if ( image ) categ = await upload_set_filename( categ, "image", "image_url" );
 
-		categ = await collection_add( _coll_categories, categ, false, CategoryKeys );
+		categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
 
 		return cback ? cback( null, categ ) : resolve( categ );
 		/*=== d2r_end post_category_admin_add ===*/
@@ -164,7 +165,7 @@ export const patch_category_admin_update = ( req: ILRequest, id: string, id_pare
 
 		categ = { ...categ, ...keys_valid( { id_parent, title, description, modules, visible, slug, top, image } ) };
 		if ( image ) categ = await upload_set_filename( categ, "image", "image_url" );
-		categ = await collection_add( _coll_categories, categ, false, CategoryKeys );
+		categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
 
 		return cback ? cback( null, categ ) : resolve( categ );
 		/*=== d2r_end patch_category_admin_update ===*/
@@ -195,7 +196,7 @@ export const patch_category_admin_fields = ( req: ILRequest, id: string, data: a
 
 		categ = { ...categ, ...keys_valid( data ) };
 		if ( data.image ) categ = await upload_set_filename( categ, "image", "image_url" );
-		categ = await collection_add( _coll_categories, categ, false, CategoryKeys );
+		categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
 
 		return cback ? cback( null, categ ) : resolve( categ );
 		/*=== d2r_end patch_category_admin_fields ===*/
@@ -216,7 +217,7 @@ export const get_category_admin_list = ( req: ILRequest, parent_only?: boolean, 
 		const domain = await system_domain_get_by_session( req );
 		const conds = parent_only ? { domain: domain.code, id_parent: { mode: 'null', name: 'id_parent' } } : { domain: domain.code };
 
-		const res = await collection_find_all_dict( req.db, COLL_CATEGORIES, conds, CategoryKeys );
+		const res = await adb_find_all( req.db, COLL_CATEGORIES, conds, CategoryKeys );
 
 		return cback ? cback( null, res ) : resolve( res );
 		/*=== d2r_end get_category_admin_list ===*/
@@ -234,10 +235,10 @@ export const get_category_admin_list = ( req: ILRequest, parent_only?: boolean, 
 export const delete_category_admin_del = ( req: ILRequest, id: string, cback: LCback = null ): Promise<string[]> => {
 	return new Promise( async ( resolve, reject ) => {
 		/*=== d2r_start delete_category_admin_del ===*/
-		await collection_del_one_dict( req.db, 'categories', { id } );
+		await adb_del_one( req.db, 'categories', { id } );
 
 		// FIXME: if category had a parent, we should update the parent too
-		let subs: any = await collection_find_all_dict( req.db, COLL_CATEGORIES, { id_parent: id } );
+		let subs: any = await adb_find_all( req.db, COLL_CATEGORIES, { id_parent: id } );
 		if ( !subs ) subs = [];
 		await _coll_categories.removeAll( subs );
 
@@ -267,7 +268,7 @@ export const post_category_admin_module_add = ( req: ILRequest, id: string, modu
 
 		_add_module( categ, module );
 
-		categ = await collection_add( _coll_categories, categ, false, CategoryKeys );
+		categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
 
 		return cback ? cback( null, categ ) : resolve( categ );
 		/*=== d2r_end post_category_admin_module_add ===*/
@@ -292,7 +293,7 @@ export const delete_category_admin_module_del = ( req: ILRequest, id: string, mo
 
 		_del_module( categ, module );
 
-		categ = await collection_add( _coll_categories, categ, false, CategoryKeys );
+		categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
 
 		return cback ? cback( null, categ ) : resolve( categ );
 		/*=== d2r_end delete_category_admin_module_del ===*/
@@ -311,7 +312,7 @@ export const delete_category_admin_module_del = ( req: ILRequest, id: string, mo
 export const get_category_list = ( req: ILRequest, id_category?: string, module?: string, cback: LCback = null ): Promise<CategoryTreeItem> => {
 	return new Promise( async ( resolve, reject ) => {
 		/*=== d2r_start get_category_list ===*/
-		const [ filters, values ] = prepare_filters( 'doc', {
+		const [ filters, values ] = adb_prepare_filters( 'doc', {
 			module: {
 				name: 'modules',
 				val: [ module ],
@@ -319,7 +320,7 @@ export const get_category_list = ( req: ILRequest, id_category?: string, module?
 			}, id: id_category
 		} );
 
-		const categs = await collection_find_all( req.db, `FOR doc IN categories
+		const categs = await adb_query_all( req.db, `FOR doc IN categories
   SORT doc.title
   ${ filters }
 
@@ -352,7 +353,7 @@ export const get_category_list = ( req: ILRequest, id_category?: string, module?
 export const get_category_top_list = ( req: ILRequest, module?: string, limit?: number, cback: LCback = null ): Promise<CategorySmallItem[]> => {
 	return new Promise( async ( resolve, reject ) => {
 		/*=== d2r_start get_category_top_list ===*/
-		const csi: CategorySmallItem[] = await collection_find_all_dict( req.db, COLL_CATEGORIES, { modules: [ module ], top: true }, CategorySmallItemKeys,
+		const csi: CategorySmallItem[] = await adb_find_all( req.db, COLL_CATEGORIES, { modules: [ module ], top: true }, CategorySmallItemKeys,
 			{ sort: [ { field: 'title' } ], rows: limit } );
 
 		return cback ? cback( null, csi ) : resolve( csi );
@@ -387,7 +388,7 @@ export const category_db_init = ( liwe: ILiWE, cback: LCback = null ): Promise<b
 		/*=== d2r_start category_db_init ===*/
 		const cat = await category_get( { db: liwe.db } as ILRequest, 'EMPTY_ID' );
 		if ( !cat ) {
-			await collection_add( _coll_categories, {
+			await adb_record_add( liwe.db, COLL_CATEGORIES, {
 				id: CATEGORY_EMPTY_ID,
 				title: 'no category',
 				id_parent: '', is_folder: false,
