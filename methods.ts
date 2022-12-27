@@ -22,8 +22,7 @@ const COLL_CATEGORIES = "categories";
 import { keys_valid, list_add, list_del, set_attr } from '../../liwe/utils';
 import { system_domain_get_by_session } from '../system/methods';
 import { upload_set_filename } from '../upload/methods';
-import { adb_record_add, adb_query_all, adb_find_one, adb_find_all, adb_del_one, adb_prepare_filters } from '../../liwe/db/arango';
-import { collection_init } from '../../liwe/arangodb';
+import { adb_collection_init, adb_record_add, adb_query_all, adb_find_one, adb_find_all, adb_del_one, adb_prepare_filters } from '../../liwe/db/arango';
 
 export const CATEGORY_EMPTY_ID = "EMPTY_ID";
 
@@ -373,7 +372,7 @@ export const category_db_init = ( liwe: ILiWE, cback: LCback = null ): Promise<b
 	return new Promise( async ( resolve, reject ) => {
 		_liwe = liwe;
 
-		_coll_categories = await collection_init( liwe.db, COLL_CATEGORIES, [
+		_coll_categories = await adb_collection_init( liwe.db, COLL_CATEGORIES, [
 			{ type: "persistent", fields: [ "id" ], unique: true },
 			{ type: "persistent", fields: [ "domain" ], unique: false },
 			{ type: "persistent", fields: [ "id_parent" ], unique: false },
