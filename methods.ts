@@ -236,7 +236,7 @@ export const get_category_admin_list = ( req: ILRequest, parent_only?: boolean, 
 		const domain = await system_domain_get_by_session( req );
 		const conds = parent_only ? { domain: domain.code, id_parent: { mode: 'null', name: 'id_parent' } } : { domain: domain.code };
 
-		const res = await adb_find_all( req.db, COLL_CATEGORIES, conds, CategoryKeys );
+		const res = await adb_find_all( req.db, COLL_CATEGORIES, conds, CategoryKeys, { sort: [ { field: 'title' } ] } );
 
 		return cback ? cback( null, res ) : resolve( res );
 		/*=== f2c_end get_category_admin_list ===*/
