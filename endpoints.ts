@@ -12,7 +12,7 @@ import { perms } from '../../liwe/auth';
 import {
 	// endpoints function
 	delete_category_admin_del, delete_category_admin_module_del, get_category_admin_list, get_category_list, get_category_top_list,
-	patch_category_admin_fields, patch_category_admin_update, post_category_admin_add, post_category_admin_module_add,
+	patch_category_admin_fields, patch_category_admin_update, post_category_admin_add, post_category_admin_module_add, post_category_slug_valid,
 	// functions
 	category_db_init,
 } from './methods';
@@ -177,6 +177,21 @@ export const init = ( liwe: ILiWE ) => {
 			if ( err ) return send_error( res, err );
 
 			send_ok( res, { categs } );
+		} );
+	} );
+
+	app.post ( '/api/category/slug/valid', perms( [ "category.editor" ] ), ( req: ILRequest, res: ILResponse ) => {
+		const { slug, id, ___errors } = typed_dict( req.body, [
+			{ name: "slug", type: "string", required: true },
+			{ name: "id", type: "string" }
+		] );
+
+		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
+
+		post_category_slug_valid ( req, slug, id, ( err: ILError, ok: boolean ) => {
+			if ( err ) return send_error( res, err );
+
+			send_ok( res, { ok } );
 		} );
 	} );
 

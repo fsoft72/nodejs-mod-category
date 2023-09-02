@@ -404,6 +404,29 @@ export const get_category_top_list = ( req: ILRequest, module?: string, limit?: 
 };
 // }}}
 
+// {{{ post_category_slug_valid ( req: ILRequest, slug: string, id?: string, cback: LCBack = null ): Promise<boolean>
+/**
+ *
+ * @param slug - The slug to check [req]
+ * @param id - The ID category (if exists) [opt]
+ *
+ * @return ok: boolean
+ *
+ */
+export const post_category_slug_valid = ( req: ILRequest, slug: string, id?: string, cback: LCback = null ): Promise<boolean> => {
+	return new Promise( async ( resolve, reject ) => {
+		/*=== f2c_start post_category_slug_valid ===*/
+		const err = {};
+		const res = await _slug_valid( req, slug, err, id );
+
+		if ( res == false ) return cback ? cback( err ) : reject( err );
+
+		return cback ? cback( null, res ) : resolve( res );
+		/*=== f2c_end post_category_slug_valid ===*/
+	} );
+};
+// }}}
+
 // {{{ category_db_init ( liwe: ILiWE, cback: LCBack = null ): Promise<boolean>
 /**
  *
