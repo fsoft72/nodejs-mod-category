@@ -25,7 +25,7 @@ const COLL_CATEGORIES = "categories";
 /*=== f2c_start __file_header === */
 import { keys_valid, list_add, list_del, mkid, set_attr } from '../../liwe/utils';
 import { system_domain_get_by_session } from '../system/methods';
-import { upload_set_filename } from '../upload/methods';
+// import { upload_set_filename } from '../upload/methods';
 import { adb_collection_init, adb_record_add, adb_query_all, adb_find_one, adb_find_all, adb_del_one, adb_prepare_filters, adb_del_all } from '../../liwe/db/arango';
 
 export const CATEGORY_EMPTY_ID = "EMPTY_ID";
@@ -129,7 +129,7 @@ export const post_category_admin_add = ( req: ILRequest, title: string, slug: st
 
 		// await _move_category_image( req, categ );
 
-		if ( image ) categ = await upload_set_filename( categ, "image", "image_url" );
+		// if ( image ) categ = await upload_set_filename( categ, "image", "image_url" );
 
 		categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
 
@@ -175,7 +175,7 @@ export const patch_category_admin_update = ( req: ILRequest, id: string, id_pare
 		}
 
 		categ = { ...categ, ...keys_valid( { id_parent, title, description, modules, visible, slug, top, image } ) };
-		if ( image ) categ = await upload_set_filename( categ, "image", "image_url" );
+		// if ( image ) categ = await upload_set_filename( categ, "image", "image_url" );
 		categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
 
 		return cback ? cback( null, categ ) : resolve( categ );
@@ -210,7 +210,7 @@ export const patch_category_admin_fields = ( req: ILRequest, id: string, data: a
 		}
 
 		categ = { ...categ, ...keys_valid( data ) };
-		if ( data.image ) categ = await upload_set_filename( categ, "image", "image_url" );
+		// if ( data.image ) categ = await upload_set_filename( categ, "image", "image_url" );
 		categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
 
 		return cback ? cback( null, categ ) : resolve( categ );
