@@ -49,6 +49,7 @@ export const init = ( liwe: ILiWE ) => {
 		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		post_category_admin_add ( req, title, slug, id_parent, description, modules, top, visible, image, ( err: ILError, category: Category ) => {
+			if ( err?.quiet ) return;
 			if ( err ) return send_error( res, err );
 
 			send_ok( res, { category } );
@@ -71,6 +72,7 @@ export const init = ( liwe: ILiWE ) => {
 		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		patch_category_admin_update ( req, id, id_parent, title, slug, description, modules, top, visible, image, ( err: ILError, category: Category ) => {
+			if ( err?.quiet ) return;
 			if ( err ) return send_error( res, err );
 
 			send_ok( res, { category } );
@@ -86,6 +88,7 @@ export const init = ( liwe: ILiWE ) => {
 		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		patch_category_admin_fields ( req, id, data, ( err: ILError, category: Category ) => {
+			if ( err?.quiet ) return;
 			if ( err ) return send_error( res, err );
 
 			send_ok( res, { category } );
@@ -100,6 +103,7 @@ export const init = ( liwe: ILiWE ) => {
 		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		get_category_admin_list ( req, parent_only, ( err: ILError, categories: Category ) => {
+			if ( err?.quiet ) return;
 			if ( err ) return send_error( res, err );
 
 			send_ok( res, { categories } );
@@ -114,6 +118,7 @@ export const init = ( liwe: ILiWE ) => {
 		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		delete_category_admin_del ( req, id, ( err: ILError, id: string ) => {
+			if ( err?.quiet ) return;
 			if ( err ) return send_error( res, err );
 
 			send_ok( res, { id } );
@@ -129,6 +134,7 @@ export const init = ( liwe: ILiWE ) => {
 		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		post_category_admin_module_add ( req, id, module, ( err: ILError, category: Category ) => {
+			if ( err?.quiet ) return;
 			if ( err ) return send_error( res, err );
 
 			send_ok( res, { category } );
@@ -144,6 +150,7 @@ export const init = ( liwe: ILiWE ) => {
 		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		delete_category_admin_module_del ( req, id, module, ( err: ILError, category: Category ) => {
+			if ( err?.quiet ) return;
 			if ( err ) return send_error( res, err );
 
 			send_ok( res, { category } );
@@ -159,6 +166,7 @@ export const init = ( liwe: ILiWE ) => {
 		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		get_category_list ( req, id_category, module, ( err: ILError, tree: CategoryTreeItem ) => {
+			if ( err?.quiet ) return;
 			if ( err ) return send_error( res, err );
 
 			send_ok( res, { tree } );
@@ -174,6 +182,7 @@ export const init = ( liwe: ILiWE ) => {
 		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		get_category_top_list ( req, module, limit, ( err: ILError, categs: CategorySmallItem ) => {
+			if ( err?.quiet ) return;
 			if ( err ) return send_error( res, err );
 
 			send_ok( res, { categs } );
@@ -189,6 +198,7 @@ export const init = ( liwe: ILiWE ) => {
 		if ( ___errors.length ) return send_error ( res, { message: `Parameters error: ${___errors.join ( ', ' )}` } );
 
 		post_category_slug_valid ( req, slug, id, ( err: ILError, ok: boolean ) => {
+			if ( err?.quiet ) return;
 			if ( err ) return send_error( res, err );
 
 			send_ok( res, { ok } );

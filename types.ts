@@ -6,43 +6,40 @@
 /** Category */
 export interface Category {
 	/** the main id field */
-	id?: string;
+	id: string;
 	/** The Domain name */
-	domain?: string;
+	domain: string;
 	/** If the category is a "sub category", the id_parent contains the id of the Category container */
-	id_parent?: string;
+	id_parent: string;
 	/** User that created this category (and it is defined as 'owner') */
-	id_owner?: string;
+	id_owner: string;
 	/** A true / false flag defining if the current category is actually a folder */
-	is_folder?: boolean;
+	is_folder: boolean;
 	/** Category name */
-	title?: string;
+	title: string;
 	/** Category description */
-	description?: string;
+	description: string;
 	/** Category image id */
-	image?: string;
-	/** Category image URL */
-	image_url?: string;
+	image: string;
 	/** Category slug */
-	slug?: string;
+	slug: string;
 	/** If the category is visible */
-	visible?: boolean;
+	visible: boolean;
 	/** This is a top category */
-	top?: boolean;
+	top: boolean;
 	/** tags for the type */
-	modules?: string[];
+	modules: string[];
 }
 
 export const CategoryKeys = {
 	'id': { type: 'string', priv: false },
-	'domain': { type: 'string', priv: true },
+	'domain': { type: 'string', priv: false },
 	'id_parent': { type: 'string', priv: false },
 	'id_owner': { type: 'string', priv: false },
 	'is_folder': { type: 'boolean', priv: false },
 	'title': { type: 'string', priv: false },
 	'description': { type: 'string', priv: false },
 	'image': { type: 'string', priv: false },
-	'image_url': { type: 'string', priv: false },
 	'slug': { type: 'string', priv: false },
 	'visible': { type: 'boolean', priv: false },
 	'top': { type: 'boolean', priv: false },
@@ -52,25 +49,28 @@ export const CategoryKeys = {
 /** CategoryTreeItem */
 export interface CategoryTreeItem {
 	/** the main id field */
-	id?: string;
+	id: string;
 	/** If the category is a "sub category", the id_parent contains the id of the Category container */
-	id_parent?: string;
+	id_parent: string;
 	/** User that created this category (and it is defined as 'owner') */
-	id_owner?: string;
+	id_owner: string;
 	/** A true / false flag defining if the current category is actually a folder */
-	is_folder?: boolean;
+	is_folder: boolean;
+	top?: boolean;
 	/** Category name */
-	title?: string;
+	title: string;
 	/** Category description */
-	description?: string;
+	description: string;
 	/** Category image */
-	image?: string;
-	/** Category image URL */
-	image_url?: string;
+	image: string;
 	/** the children of this Tree Item */
-	children?: Category[];
+	children: CategoryTreeItem[];
 	/** Slug */
-	slug?: string;
+	slug: string;
+	/** Flag T/F for category visibility */
+	visible: boolean;
+	/** Category modules */
+	modules?: string[];
 }
 
 export const CategoryTreeItemKeys = {
@@ -78,26 +78,26 @@ export const CategoryTreeItemKeys = {
 	'id_parent': { type: 'string', priv: false },
 	'id_owner': { type: 'string', priv: false },
 	'is_folder': { type: 'boolean', priv: false },
+	'top': { type: 'boolean', priv: false },
 	'title': { type: 'string', priv: false },
 	'description': { type: 'string', priv: false },
 	'image': { type: 'string', priv: false },
-	'image_url': { type: 'string', priv: false },
-	'children': { type: 'Category[]', priv: false },
+	'children': { type: 'CategoryTreeItem[]', priv: false },
 	'slug': { type: 'string', priv: false },
+	'visible': { type: 'boolean', priv: false },
+	'modules': { type: 'string[]', priv: false },
 };
 
 /** CategorySmallItem */
 export interface CategorySmallItem {
 	/** the main id field */
-	id?: string;
+	id: string;
 	/** Category name */
-	title?: string;
+	title: string;
 	/** Category description */
-	description?: string;
+	description: string;
 	/** Category image */
-	image?: string;
-	/** Category image URL */
-	image_url?: string;
+	image: string;
 }
 
 export const CategorySmallItemKeys = {
@@ -105,6 +105,5 @@ export const CategorySmallItemKeys = {
 	'title': { type: 'string', priv: false },
 	'description': { type: 'string', priv: false },
 	'image': { type: 'string', priv: false },
-	'image_url': { type: 'string', priv: false },
 };
 
