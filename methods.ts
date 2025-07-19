@@ -4,6 +4,7 @@
  */
 
 import { ILRequest, ILResponse, LCback, ILiweConfig, ILError, ILiWE } from '../../liwe/types';
+import { LiWEResponse, responseError, responseSuccess } from '../../liwe/response';
 import { $l } from '../../liwe/locale';
 import { system_permissions_register } from '../system/methods';
 
@@ -83,7 +84,7 @@ const _move_category_image = async ( req: ILRequest, c: Category ) => {
 */
 /*=== f2c_end __file_header ===*/
 
-// {{{ post_category_admin_add ( req: ILRequest, title: string, slug: string, id_parent?: string, description?: string, modules?: string[], top?: boolean, visible: boolean = true, image?: string, cback: LCBack = null ): Promise<Category>
+// {{{ post_category_admin_add ( req: ILRequest, title: string, slug: string, id_parent?: string, description?: string, modules?: string[], top?: boolean, visible: boolean = true, image?: stringcback: LCBack = null ): Promise<Category>
 /**
  *
  * The call creates a category inside the system.
@@ -101,45 +102,43 @@ const _move_category_image = async ( req: ILRequest, c: Category ) => {
  * @return category: Category
  *
  */
-export const post_category_admin_add = ( req: ILRequest, title: string, slug: string, id_parent?: string, description?: string, modules?: string[], top?: boolean, visible: boolean = true, image?: string, cback: LCback = null ): Promise<Category> => {
-	return new Promise( async ( resolve, reject ) => {
-		/*=== f2c_start post_category_admin_add ===*/
-		const err = { message: 'Category not found' };
+export const post_category_admin_add = async ( req: ILRequest, title: string, slug: string, id_parent?: string, description?: string, modules?: string[], top?: boolean, visible: boolean = true, image?: string ): Promise<LiWEResponse<Category>> => {
+	/*=== f2c_start post_category_admin_add ===*/
+	const err = { message: 'Category not found' };
 
-		if ( !id_parent ) id_parent = "";
-		if ( !modules ) modules = [];
+	if ( !id_parent ) id_parent = "";
+	if ( !modules ) modules = [];
 
-		slug = _slug_transform( slug );
+	slug = _slug_transform( slug );
 
-		if ( await _slug_valid( req, slug, err ) == false )
-			return cback ? cback( err ) : reject( err );
+	if ( await _slug_valid( req, slug, err ) == false )
+		return responseError( err.message ); // FIXME: remove .message
 
-		const domain = await system_domain_get_by_session( req );
+	const domain = await system_domain_get_by_session( req );
 
-		let categ: Category = { is_folder: false, id: mkid( 'category' ), title, description, modules: [], id_owner: req.user.id, id_parent, domain: domain.code, visible, slug, top, image };
+	let categ: Category = { is_folder: false, id: mkid( 'category' ), title, description, modules: [], id_owner: req.user.id, id_parent, domain: domain.code, visible, slug, top, image };
 
-		modules.forEach( ( m ) => _add_module( categ, m ) );
+	modules.forEach( ( m ) => _add_module( categ, m ) );
 
-		if ( id_parent ) {
-			const parent: Category = await category_get( req, id_parent );
-			if ( !parent ) return cback ? cback( err ) : reject( err );
-			parent.is_folder = true;
-			await adb_record_add( req.db, COLL_CATEGORIES, parent );
-		}
+	if ( id_parent ) {
+		const parent: Category = await category_get( req, id_parent );
+		if ( !parent ) return responseError( err.message ); // FIXME: remove .message
+		parent.is_folder = true;
+		await adb_record_add( req.db, COLL_CATEGORIES, parent );
+	}
 
-		// await _move_category_image( req, categ );
+	// await _move_category_image( req, categ );
 
-		// if ( image ) categ = await upload_set_filename( categ, "image", "image_url" );
+	// if ( image ) categ = await upload_set_filename( categ, "image", "image_url" );
 
-		categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
+	categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
 
-		return cback ? cback( null, categ ) : resolve( categ );
-		/*=== f2c_end post_category_admin_add ===*/
-	} );
+	return responseSuccess( categ );
+	/*=== f2c_end post_category_admin_add ===*/
 };
 // }}}
 
-// {{{ patch_category_admin_update ( req: ILRequest, id: string, id_parent?: string, title?: string, slug?: string, description?: string, modules?: string[], top?: boolean, visible?: boolean, image?: string, cback: LCBack = null ): Promise<Category>
+// {{{ patch_category_admin_update ( req: ILRequest, id: string, id_parent?: string, title?: string, slug?: string, description?: string, modules?: string[], top?: boolean, visible?: boolean, image?: stringcback: LCBack = null ): Promise<Category>
 /**
  *
  * The call updates a category inside the system.
@@ -158,33 +157,31 @@ export const post_category_admin_add = ( req: ILRequest, title: string, slug: st
  * @return category: Category
  *
  */
-export const patch_category_admin_update = ( req: ILRequest, id: string, id_parent?: string, title?: string, slug?: string, description?: string, modules?: string[], top?: boolean, visible?: boolean, image?: string, cback: LCback = null ): Promise<Category> => {
-	return new Promise( async ( resolve, reject ) => {
-		/*=== f2c_start patch_category_admin_update ===*/
-		const err = { message: 'Category not found' };
-		let categ: Category = await category_get( req, id );
+export const patch_category_admin_update = async ( req: ILRequest, id: string, id_parent?: string, title?: string, slug?: string, description?: string, modules?: string[], top?: boolean, visible?: boolean, image?: string ): Promise<LiWEResponse<Category>> => {
+	/*=== f2c_start patch_category_admin_update ===*/
+	const err = { message: 'Category not found' };
+	let categ: Category = await category_get( req, id );
 
-		if ( !categ ) return cback ? cback( err ) : reject( err );
+	if ( !categ ) return responseError( err.message ); // FIXME: remove .message
 
-		if ( slug ) {
-			slug = _slug_transform( slug );
-			if ( await _slug_valid( req, slug, err, id ) == false ) {
-				err.message = 'Slug already in use';
-				return cback ? cback( err ) : reject( err );
-			}
+	if ( slug ) {
+		slug = _slug_transform( slug );
+		if ( await _slug_valid( req, slug, err, id ) == false ) {
+			err.message = 'Slug already in use';
+			return responseError( err.message ); // FIXME: remove .message
 		}
+	}
 
-		categ = { ...categ, ...keys_valid( { id_parent, title, description, modules, visible, slug, top, image } ) };
-		// if ( image ) categ = await upload_set_filename( categ, "image", "image_url" );
-		categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
+	categ = { ...categ, ...keys_valid( { id_parent, title, description, modules, visible, slug, top, image } ) };
+	// if ( image ) categ = await upload_set_filename( categ, "image", "image_url" );
+	categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
 
-		return cback ? cback( null, categ ) : resolve( categ );
-		/*=== f2c_end patch_category_admin_update ===*/
-	} );
+	return responseSuccess( categ );
+	/*=== f2c_end patch_category_admin_update ===*/
 };
 // }}}
 
-// {{{ patch_category_admin_fields ( req: ILRequest, id: string, data: any, cback: LCBack = null ): Promise<Category>
+// {{{ patch_category_admin_fields ( req: ILRequest, id: string, data: anycback: LCBack = null ): Promise<Category>
 /**
  *
  * The call modifies a single field.
@@ -196,30 +193,28 @@ export const patch_category_admin_update = ( req: ILRequest, id: string, id_pare
  * @return category: Category
  *
  */
-export const patch_category_admin_fields = ( req: ILRequest, id: string, data: any, cback: LCback = null ): Promise<Category> => {
-	return new Promise( async ( resolve, reject ) => {
-		/*=== f2c_start patch_category_admin_fields ===*/
-		const err = { message: 'Category not found' };
-		let categ: Category = await category_get( req, id );
-		if ( !categ ) return cback ? cback( err ) : reject( err );
+export const patch_category_admin_fields = async ( req: ILRequest, id: string, data: any ): Promise<LiWEResponse<Category>> => {
+	/*=== f2c_start patch_category_admin_fields ===*/
+	const err = { message: 'Category not found' };
+	let categ: Category = await category_get( req, id );
+	if ( !categ ) return responseError( err.message ); // FIXME: remove .message
 
-		if ( data.slug ) {
-			data.slug = _slug_transform( data.slug );
-			if ( await _slug_valid( req, data.slug, err, id ) == false )
-				return cback ? cback( err ) : reject( err );
-		}
+	if ( data.slug ) {
+		data.slug = _slug_transform( data.slug );
+		if ( await _slug_valid( req, data.slug, err, id ) == false )
+			return responseError( err.message ); // FIXME: remove .message
+	}
 
-		categ = { ...categ, ...keys_valid( data ) };
-		// if ( data.image ) categ = await upload_set_filename( categ, "image", "image_url" );
-		categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
+	categ = { ...categ, ...keys_valid( data ) };
+	// if ( data.image ) categ = await upload_set_filename( categ, "image", "image_url" );
+	categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
 
-		return cback ? cback( null, categ ) : resolve( categ );
-		/*=== f2c_end patch_category_admin_fields ===*/
-	} );
+	return responseSuccess( categ );
+	/*=== f2c_end patch_category_admin_fields ===*/
 };
 // }}}
 
-// {{{ get_category_admin_list ( req: ILRequest, parent_only?: boolean, cback: LCBack = null ): Promise<Category[]>
+// {{{ get_category_admin_list ( req: ILRequest, parent_only?: booleancback: LCBack = null ): Promise<Category[]>
 /**
  *
  * The call lists all categories in the system.
@@ -230,21 +225,19 @@ export const patch_category_admin_fields = ( req: ILRequest, id: string, data: a
  * @return categories: Category
  *
  */
-export const get_category_admin_list = ( req: ILRequest, parent_only?: boolean, cback: LCback = null ): Promise<Category[]> => {
-	return new Promise( async ( resolve, reject ) => {
-		/*=== f2c_start get_category_admin_list ===*/
-		const domain = await system_domain_get_by_session( req );
-		const conds = parent_only ? { domain: domain.code, id_parent: { mode: 'null', name: 'id_parent' } } : { domain: domain.code };
+export const get_category_admin_list = async ( req: ILRequest, parent_only?: boolean ): Promise<LiWEResponse<Category[]>> => {
+	/*=== f2c_start get_category_admin_list ===*/
+	const domain = await system_domain_get_by_session( req );
+	const conds = parent_only ? { domain: domain.code, id_parent: { mode: 'null', name: 'id_parent' } } : { domain: domain.code };
 
-		const res = await adb_find_all( req.db, COLL_CATEGORIES, conds, CategoryKeys, { sort: [ { field: 'title' } ] } );
+	const res = await adb_find_all( req.db, COLL_CATEGORIES, conds, CategoryKeys, { sort: [ { field: 'title' } ] } );
 
-		return cback ? cback( null, res ) : resolve( res );
-		/*=== f2c_end get_category_admin_list ===*/
-	} );
+	return responseSuccess( res );
+	/*=== f2c_end get_category_admin_list ===*/
 };
 // }}}
 
-// {{{ delete_category_admin_del ( req: ILRequest, id: string, cback: LCBack = null ): Promise<string>
+// {{{ delete_category_admin_del ( req: ILRequest, id: stringcback: LCBack = null ): Promise<string>
 /**
  *
  * This call deletes a category. If the category contains sub categories, all sub categories will be deleted as well, recursively.
@@ -254,32 +247,30 @@ export const get_category_admin_list = ( req: ILRequest, parent_only?: boolean, 
  * @return id: string
  *
  */
-export const delete_category_admin_del = ( req: ILRequest, id: string, cback: LCback = null ): Promise<string> => {
-	return new Promise( async ( resolve, reject ) => {
-		/*=== f2c_start delete_category_admin_del ===*/
-		await adb_del_one( req.db, 'categories', { id } );
+export const delete_category_admin_del = async ( req: ILRequest, id: string ): Promise<LiWEResponse<string>> => {
+	/*=== f2c_start delete_category_admin_del ===*/
+	await adb_del_one( req.db, 'categories', { id } );
 
-		// FIXME: if category had a parent, we should update the parent too
+	// FIXME: if category had a parent, we should update the parent too
 
 
-		const res = await adb_del_all( req.db, COLL_CATEGORIES, { id_parent: id } );
+	const res = await adb_del_all( req.db, COLL_CATEGORIES, { id_parent: id } );
 
-		/*
-		let subs: any = await adb_find_all( req.db, COLL_CATEGORIES, { id_parent: id } );
-		if ( !subs ) subs = [];
-		await _coll_categories.removeAll( subs );
+	/*
+	let subs: any = await adb_find_all( req.db, COLL_CATEGORIES, { id_parent: id } );
+	if ( !subs ) subs = [];
+	await _coll_categories.removeAll( subs );
 
-		const res = subs.map( ( s: any ) => s.id );
-		res.push( id );
-		*/
+	const res = subs.map( ( s: any ) => s.id );
+	res.push( id );
+	*/
 
-		return cback ? cback( null, id ) : resolve( id );
-		/*=== f2c_end delete_category_admin_del ===*/
-	} );
+	return responseSuccess( id );
+	/*=== f2c_end delete_category_admin_del ===*/
 };
 // }}}
 
-// {{{ post_category_admin_module_add ( req: ILRequest, id: string, module: string, cback: LCBack = null ): Promise<Category>
+// {{{ post_category_admin_module_add ( req: ILRequest, id: string, module: stringcback: LCBack = null ): Promise<Category>
 /**
  *
  * The call updates a category adding a new module.
@@ -291,24 +282,22 @@ export const delete_category_admin_del = ( req: ILRequest, id: string, cback: LC
  * @return category: Category
  *
  */
-export const post_category_admin_module_add = ( req: ILRequest, id: string, module: string, cback: LCback = null ): Promise<Category> => {
-	return new Promise( async ( resolve, reject ) => {
-		/*=== f2c_start post_category_admin_module_add ===*/
-		const err = { message: 'Category not found' };
-		let categ: Category = await category_get( req, id );
-		if ( !categ ) return cback ? cback( err ) : reject( err );
+export const post_category_admin_module_add = async ( req: ILRequest, id: string, module: string ): Promise<LiWEResponse<Category>> => {
+	/*=== f2c_start post_category_admin_module_add ===*/
+	const err = { message: 'Category not found' };
+	let categ: Category = await category_get( req, id );
+	if ( !categ ) return responseError( err.message ); // FIXME: remove .message
 
-		_add_module( categ, module );
+	_add_module( categ, module );
 
-		categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
+	categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
 
-		return cback ? cback( null, categ ) : resolve( categ );
-		/*=== f2c_end post_category_admin_module_add ===*/
-	} );
+	return responseSuccess( categ );
+	/*=== f2c_end post_category_admin_module_add ===*/
 };
 // }}}
 
-// {{{ delete_category_admin_module_del ( req: ILRequest, id: string, module: string, cback: LCBack = null ): Promise<Category>
+// {{{ delete_category_admin_module_del ( req: ILRequest, id: string, module: stringcback: LCBack = null ): Promise<Category>
 /**
  *
  * The call updates a category deleting a new module.
@@ -320,24 +309,22 @@ export const post_category_admin_module_add = ( req: ILRequest, id: string, modu
  * @return category: Category
  *
  */
-export const delete_category_admin_module_del = ( req: ILRequest, id: string, module: string, cback: LCback = null ): Promise<Category> => {
-	return new Promise( async ( resolve, reject ) => {
-		/*=== f2c_start delete_category_admin_module_del ===*/
-		const err = { message: 'Category not found' };
-		let categ: Category = await category_get( req, id );
-		if ( !categ ) return cback ? cback( err ) : reject( err );
+export const delete_category_admin_module_del = async ( req: ILRequest, id: string, module: string ): Promise<LiWEResponse<Category>> => {
+	/*=== f2c_start delete_category_admin_module_del ===*/
+	const err = { message: 'Category not found' };
+	let categ: Category = await category_get( req, id );
+	if ( !categ ) return responseError( err.message ); // FIXME: remove .message
 
-		_del_module( categ, module );
+	_del_module( categ, module );
 
-		categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
+	categ = await adb_record_add( req.db, COLL_CATEGORIES, categ, CategoryKeys );
 
-		return cback ? cback( null, categ ) : resolve( categ );
-		/*=== f2c_end delete_category_admin_module_del ===*/
-	} );
+	return responseSuccess( categ );
+	/*=== f2c_end delete_category_admin_module_del ===*/
 };
 // }}}
 
-// {{{ get_category_list ( req: ILRequest, id_category?: string, module?: string, cback: LCBack = null ): Promise<CategoryTreeItem>
+// {{{ get_category_list ( req: ILRequest, id_category?: string, module?: stringcback: LCBack = null ): Promise<CategoryTreeItem>
 /**
  *
  * This endpoint returns all the categories as a tree
@@ -348,18 +335,17 @@ export const delete_category_admin_module_del = ( req: ILRequest, id: string, mo
  * @return tree: CategoryTreeItem
  *
  */
-export const get_category_list = ( req: ILRequest, id_category?: string, module?: string, cback: LCback = null ): Promise<CategoryTreeItem> => {
-	return new Promise( async ( resolve, reject ) => {
-		/*=== f2c_start get_category_list ===*/
-		const [ filters, values ] = adb_prepare_filters( 'doc', {
-			module: {
-				name: 'modules',
-				val: [ module ],
-				mode: 'a'
-			}, id: id_category
-		} );
+export const get_category_list = async ( req: ILRequest, id_category?: string, module?: string ): Promise<LiWEResponse<CategoryTreeItem>> => {
+	/*=== f2c_start get_category_list ===*/
+	const [ filters, values ] = adb_prepare_filters( 'doc', {
+		module: {
+			name: 'modules',
+			val: [ module ],
+			mode: 'a'
+		}, id: id_category
+	} );
 
-		const categs = await adb_query_all( req.db, `FOR doc IN categories
+	const categs = await adb_query_all( req.db, `FOR doc IN categories
   SORT doc.title
   ${ filters }
 
@@ -380,17 +366,16 @@ export const get_category_list = ( req: ILRequest, id_category?: string, module?
 	visible: doc.visible
 }, { children } )`, values );
 
-		if ( !categs.length ) return cback ? cback( null, null ) : resolve( null );
+	if ( !categs.length ) return responseSuccess( null );
 
-		const res = categs.filter( ( cat: Category ) => cat.id_parent == '' );
+	const res = categs.filter( ( cat: Category ) => cat.id_parent == '' );
 
-		return cback ? cback( null, res ) : resolve( res as any );
-		/*=== f2c_end get_category_list ===*/
-	} );
+	return responseSuccess( res );
+	/*=== f2c_end get_category_list ===*/
 };
 // }}}
 
-// {{{ get_category_top_list ( req: ILRequest, module?: string, limit?: number, cback: LCBack = null ): Promise<CategorySmallItem[]>
+// {{{ get_category_top_list ( req: ILRequest, module?: string, limit?: numbercback: LCBack = null ): Promise<CategorySmallItem[]>
 /**
  *
  * This endpoint returns all the top categories (parent)
@@ -401,19 +386,17 @@ export const get_category_list = ( req: ILRequest, id_category?: string, module?
  * @return categs: CategorySmallItem
  *
  */
-export const get_category_top_list = ( req: ILRequest, module?: string, limit?: number, cback: LCback = null ): Promise<CategorySmallItem[]> => {
-	return new Promise( async ( resolve, reject ) => {
-		/*=== f2c_start get_category_top_list ===*/
-		const csi: CategorySmallItem[] = await adb_find_all( req.db, COLL_CATEGORIES, { modules: [ module ], top: true }, CategorySmallItemKeys,
-			{ sort: [ { field: 'title' } ], rows: limit } );
+export const get_category_top_list = async ( req: ILRequest, module?: string, limit?: number ): Promise<LiWEResponse<CategorySmallItem[]>> => {
+	/*=== f2c_start get_category_top_list ===*/
+	const csi: CategorySmallItem[] = await adb_find_all( req.db, COLL_CATEGORIES, { modules: [ module ], top: true }, CategorySmallItemKeys,
+		{ sort: [ { field: 'title' } ], rows: limit } );
 
-		return cback ? cback( null, csi ) : resolve( csi );
-		/*=== f2c_end get_category_top_list ===*/
-	} );
+	return responseSuccess( csi );
+	/*=== f2c_end get_category_top_list ===*/
 };
 // }}}
 
-// {{{ post_category_slug_valid ( req: ILRequest, slug: string, id?: string, cback: LCBack = null ): Promise<boolean>
+// {{{ post_category_slug_valid ( req: ILRequest, slug: string, id?: stringcback: LCBack = null ): Promise<boolean>
 /**
  *
  * @param slug - The slug to check [req]
@@ -422,17 +405,15 @@ export const get_category_top_list = ( req: ILRequest, module?: string, limit?: 
  * @return ok: boolean
  *
  */
-export const post_category_slug_valid = ( req: ILRequest, slug: string, id?: string, cback: LCback = null ): Promise<boolean> => {
-	return new Promise( async ( resolve, reject ) => {
-		/*=== f2c_start post_category_slug_valid ===*/
-		const err = {};
-		const res = await _slug_valid( req, slug, err, id );
+export const post_category_slug_valid = async ( req: ILRequest, slug: string, id?: string ): Promise<LiWEResponse<boolean>> => {
+	/*=== f2c_start post_category_slug_valid ===*/
+	const err = { message: '' };
+	const res = await _slug_valid( req, slug, err, id );
 
-		if ( res == false ) return cback ? cback( err ) : reject( err );
+	if ( res == false ) return responseError( err.message );
 
-		return cback ? cback( null, res ) : resolve( res );
-		/*=== f2c_end post_category_slug_valid ===*/
-	} );
+	return responseSuccess( res );
+	/*=== f2c_end post_category_slug_valid ===*/
 };
 // }}}
 
@@ -446,39 +427,37 @@ export const post_category_slug_valid = ( req: ILRequest, slug: string, id?: str
  * @return : boolean
  *
  */
-export const category_db_init = ( liwe: ILiWE, cback: LCback = null ): Promise<boolean> => {
-	return new Promise( async ( resolve, reject ) => {
-		_liwe = liwe;
+export const category_db_init = async ( liwe: ILiWE, cback: LCback = null ): Promise<boolean> => {
+	_liwe = liwe;
 
-		system_permissions_register( 'category', _module_perms );
+	system_permissions_register( 'category', _module_perms );
 
-		await adb_collection_init( liwe.db, COLL_CATEGORIES, [
-			{ type: "persistent", fields: [ "id" ], unique: true },
-			{ type: "persistent", fields: [ "domain" ], unique: false },
-			{ type: "persistent", fields: [ "id_parent" ], unique: false },
-			{ type: "persistent", fields: [ "id_owner" ], unique: false },
-			{ type: "persistent", fields: [ "is_folder" ], unique: false },
-			{ type: "persistent", fields: [ "slug" ], unique: true },
-			{ type: "persistent", fields: [ "visible" ], unique: false },
-			{ type: "persistent", fields: [ "top" ], unique: false },
-			{ type: "persistent", fields: [ "modules[*]" ], unique: false },
-		], { drop: false } );
+	await adb_collection_init( liwe.db, COLL_CATEGORIES, [
+		{ type: "persistent", fields: [ "id" ], unique: true },
+		{ type: "persistent", fields: [ "domain" ], unique: false },
+		{ type: "persistent", fields: [ "id_parent" ], unique: false },
+		{ type: "persistent", fields: [ "id_owner" ], unique: false },
+		{ type: "persistent", fields: [ "is_folder" ], unique: false },
+		{ type: "persistent", fields: [ "slug" ], unique: true },
+		{ type: "persistent", fields: [ "visible" ], unique: false },
+		{ type: "persistent", fields: [ "top" ], unique: false },
+		{ type: "persistent", fields: [ "modules[*]" ], unique: false },
+	], { drop: false } );
 
-		/*=== f2c_start category_db_init ===*/
-		const cat = await category_get( { db: liwe.db } as ILRequest, 'EMPTY_ID' );
-		if ( !cat ) {
-			await adb_record_add( liwe.db, COLL_CATEGORIES, {
-				id: CATEGORY_EMPTY_ID,
-				title: 'no category',
-				id_parent: '', is_folder: false,
-				modules: [],
-				slug: '__empty__', visible: true, top: true, domain: '', id_owner: '', created: new Date()
-			} );
-		}
+	/*=== f2c_start category_db_init ===*/
+	const cat = await category_get( { db: liwe.db } as ILRequest, 'EMPTY_ID' );
+	if ( !cat ) {
+		await adb_record_add( liwe.db, COLL_CATEGORIES, {
+			id: CATEGORY_EMPTY_ID,
+			title: 'no category',
+			id_parent: '', is_folder: false,
+			modules: [],
+			slug: '__empty__', visible: true, top: true, domain: '', id_owner: '', created: new Date()
+		} );
+	}
+	/*=== f2c_end category_db_init ===*/
 
-		return cback ? cback( null, true ) : resolve( true );
-		/*=== f2c_end category_db_init ===*/
-	} );
+	return true;
 };
 // }}}
 
